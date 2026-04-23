@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DepositCalc</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #0b1120;
+      --surface:  #111b2e;
+      --card:     #162035;
+      --border:   #1e2e4a;
+      --accent1:  #00d4a0;
+      --accent2:  #0096ff;
+      --accent-g: linear-gradient(135deg, #00d4a0, #0096ff);
+      --warn:     #f59e0b;
+      --text:     #e8edf5;
+      --muted:    #6b7fa3;
+      --input-bg: #0e1628;
+      --radius:   14px;
+      --shadow:   0 8px 32px rgba(0,0,0,.45);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 10% 20%, rgba(0,150,255,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 90% 80%, rgba(0,212,160,.10) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='none' stroke='%231e2e4a' stroke-width='.4'/%3E%3C/svg%3E");
+      opacity: .45; pointer-events: none;
+    }
+
+    .wrapper {
+      position: relative; z-index: 1;
+      max-width: 860px; margin: 0 auto;
+      padding: 44px 20px 28px;
+    }
+
+    /* ── Top controls ── */
+    .top-controls {
+      display: flex; justify-content: center; flex-wrap: wrap;
+      gap: 10px; margin-bottom: 36px;
+    }
+    .pill-group {
+      display: inline-flex;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 99px; padding: 4px; gap: 2px;
+    }
+    .pill-btn {
+      padding: 7px 18px; border: none; border-radius: 99px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+      letter-spacing: .04em; cursor: pointer; background: transparent;
+      color: var(--muted); transition: background .25s, color .25s, box-shadow .25s;
+      white-space: nowrap;
+    }
+    .pill-btn.active {
+      background: var(--accent-g); color: #fff;
+      box-shadow: 0 2px 14px rgba(0,212,160,.4);
+    }
+    .pill-divider { width: 1px; background: var(--border); margin: 6px 4px; align-self: stretch; }
+
+    /* ── Header ── */
+    header { text-align: center; margin-bottom: 36px; }
+    .logo-mark { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .logo-icon {
+      width: 44px; height: 44px; background: var(--accent-g);
+      border-radius: 10px; display: grid; place-items: center;
+      font-size: 22px; box-shadow: 0 0 24px rgba(0,212,160,.35);
+    }
+    .logo-name {
+      font-family: 'DM Serif Display', serif; font-size: 28px;
+      background: var(--accent-g); -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(24px, 5vw, 40px); line-height: 1.15;
+      color: var(--text); margin-bottom: 8px;
+    }
+    header h1 em { font-style: italic; color: var(--accent1); }
+    header p { color: var(--muted); font-size: 15px; font-weight: 300; }
+
+    /* ── Info box (what is deposit) ── */
+    .info-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent1);
+      border-radius: var(--radius); padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .info-box-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--accent1); margin-bottom: 10px;
+    }
+    .info-box p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+      background: rgba(245,158,11,.06); border: 1px solid rgba(245,158,11,.25);
+      border-radius: var(--radius); padding: 14px 20px;
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .disclaimer-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .disclaimer p { font-size: 13px; color: #d4a03a; line-height: 1.6; }
+    .disclaimer strong { color: var(--warn); }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 36px; box-shadow: var(--shadow);
+    }
+    .section-label {
+      font-size: 11px; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent1);
+      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .label-row { display: flex; align-items: center; justify-content: space-between; }
+    label { font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: .02em; }
+    .limit-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: .05em;
+      padding: 2px 8px; border-radius: 99px;
+      background: rgba(0,150,255,.1); color: var(--accent2);
+      border: 1px solid rgba(0,150,255,.22); white-space: nowrap;
+    }
+
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-prefix, .input-suffix {
+      position: absolute; font-size: 13px; font-weight: 600;
+      color: var(--muted); pointer-events: none;
+    }
+    .input-prefix { left: 14px; }
+    .input-suffix { right: 14px; }
+
+    input[type="number"], select {
+      width: 100%; background: var(--input-bg);
+      border: 1.5px solid var(--border); border-radius: 9px;
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 500; padding: 12px 14px;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"].has-prefix { padding-left: 52px; }
+    input[type="number"].has-suffix { padding-right: 36px; }
+    input[type="number"]:focus, select:focus {
+      border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(0,150,255,.15);
+    }
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7fa3' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; cursor: pointer;
+    }
+
+    .duration-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .duration-row select { width: auto; min-width: 110px; }
+
+    /* ── Radio pills ── */
+    .radio-group { display: flex; gap: 12px; flex-wrap: wrap; }
+    .radio-pill {
+      flex: 1; min-width: 140px;
+      display: flex; align-items: center; gap: 10px;
+      background: var(--input-bg); border: 1.5px solid var(--border);
+      border-radius: 9px; padding: 12px 16px; cursor: pointer;
+      transition: border-color .2s, background .2s; user-select: none;
+    }
+    .radio-pill:has(input:checked) { border-color: var(--accent1); background: rgba(0,212,160,.07); }
+    .radio-pill input[type="radio"] { display: none; }
+    .radio-pill .dot {
+      width: 17px; height: 17px; border: 2px solid var(--border);
+      border-radius: 50%; flex-shrink: 0; display: grid; place-items: center;
+      transition: border-color .2s;
+    }
+    .radio-pill:has(input:checked) .dot { border-color: var(--accent1); background: rgba(0,212,160,.15); }
+    .radio-pill:has(input:checked) .dot::after {
+      content: ''; width: 7px; height: 7px;
+      background: var(--accent1); border-radius: 50%;
+    }
+    .radio-pill .pill-label { font-size: 14px; font-weight: 500; }
+    .radio-pill .pill-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    /* ── Compound options box ── */
+    #compound-options {
+      display: none; margin-top: 4px;
+      background: rgba(0,150,255,.05); border: 1px solid rgba(0,150,255,.2);
+      border-radius: 10px; padding: 20px;
+    }
+    #compound-options.visible { display: block; animation: fadeSlide .3s ease; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .divider { height: 1px; background: var(--border); margin: 24px 0; }
+    .error-msg { font-size: 12px; color: #ff6b7a; margin-top: 2px; display: none; }
+    .error-msg.show { display: block; }
+    input.invalid { border-color: #ff6b7a !important; }
+
+    .btn-calc {
+      width: 100%; padding: 16px;
+      background: var(--accent-g); border: none; border-radius: 10px;
+      color: #fff; font-family: 'DM Sans', sans-serif;
+      font-size: 16px; font-weight: 600; letter-spacing: .03em;
+      cursor: pointer; transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 20px rgba(0,212,160,.3);
+    }
+    .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,212,160,.45); }
+    .btn-calc:active { transform: translateY(0); }
+
+    /* ── Result ── */
+    #result-panel { margin-top: 28px; display: none; }
+    #result-panel.show { display: block; animation: resultReveal .45s cubic-bezier(.22,1,.36,1); }
+    @keyframes resultReveal {
+      from { opacity: 0; transform: translateY(20px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .result-header .badge {
+      background: var(--accent-g); border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: #fff;
+    }
+    .result-header h2 { font-family: 'DM Serif Display', serif; font-size: 20px; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 14px; }
+    @media (max-width: 580px) { .stat-grid { grid-template-columns: 1fr; } }
+
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; position: relative; overflow: hidden;
+    }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .stat-card.total::before  { background: var(--accent-g); }
+    .stat-card.profit::before { background: linear-gradient(90deg,#00d4a0,#00e5b0); }
+    .stat-card.apy::before    { background: linear-gradient(90deg,#0096ff,#00c3ff); }
+
+    .stat-label { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: clamp(16px,3vw,25px); line-height: 1.1; word-break: break-all; }
+    .stat-card.total  .stat-value { color: var(--accent1); }
+    .stat-card.profit .stat-value { color: #00e5b0; }
+    .stat-card.apy    .stat-value { color: var(--accent2); }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    .breakdown-bar {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .breakdown-bar h3 { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 14px; }
+    .bar-track { height: 12px; border-radius: 99px; background: var(--border); overflow: hidden; display: flex; }
+    .bar-fill-modal  { background: var(--accent2); height: 100%; transition: width .8s cubic-bezier(.22,1,.36,1); }
+    .bar-fill-profit { background: var(--accent1); height: 100%; transition: width .8s .1s cubic-bezier(.22,1,.36,1); }
+    .bar-legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .legend-dot.modal  { background: var(--accent2); }
+    .legend-dot.profit { background: var(--accent1); }
+
+    /* ── Field hint ── */
+    .field-hint {
+      font-size: 12px; color: var(--muted); line-height: 1.55;
+      background: rgba(255,255,255,.03); border-left: 2px solid var(--border);
+      border-radius: 0 6px 6px 0; padding: 8px 12px; margin-top: 2px;
+    }
+
+    /* ── Interest explanation cards ── */
+    .interest-info {
+      display: none; margin-top: 12px;
+      gap: 12px;
+    }
+    .interest-info.show { display: grid; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 560px) { .interest-info.show { grid-template-columns: 1fr; } }
+
+    .icard {
+      border-radius: 10px; padding: 16px 18px;
+      border: 1.5px solid var(--border);
+      position: relative; overflow: hidden;
+      transition: border-color .25s, background .25s;
+    }
+    .icard.simple   { background: rgba(0,212,160,.04);  border-color: rgba(0,212,160,.25); }
+    .icard.compound { background: rgba(0,150,255,.04);  border-color: rgba(0,150,255,.25); }
+    .icard.simple.active   { background: rgba(0,212,160,.13); border-color: var(--accent1); box-shadow: 0 0 0 3px rgba(0,212,160,.12); }
+    .icard.compound.active { background: rgba(0,150,255,.13); border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(0,150,255,.12); }
+    .icard-title {
+      font-size: 12px; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; margin-bottom: 7px;
+    }
+    .icard.simple  .icard-title { color: var(--accent1); }
+    .icard.compound .icard-title { color: var(--accent2); }
+    .icard p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .icard .icard-formula {
+      display: inline-block; margin-top: 8px;
+      font-family: 'Courier New', monospace; font-size: 12px;
+      padding: 4px 10px; border-radius: 6px; color: var(--text);
+    }
+    .icard.simple  .icard-formula { background: rgba(0,212,160,.10); }
+    .icard.compound .icard-formula { background: rgba(0,150,255,.10); }
+
+    /* ── Freq hint ── */
+    #freq-hint {
+      margin-top: 10px; font-size: 12px; color: var(--muted);
+      line-height: 1.6; display: none;
+    }
+    #freq-hint.show { display: block; }
+
+    /* ── Result explanation ── */
+    .result-explain {
+      margin-top: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .result-explain-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent1);
+      background: rgba(0,212,160,.04);
+    }
+    .explain-rows { padding: 4px 0 0; }
+    .explain-row {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid rgba(30,46,74,.7);
+      transition: background .15s;
+    }
+    .explain-row:hover { background: rgba(255,255,255,.015); }
+    .explain-row.last-row { border-bottom: none; }
+
+    .explain-icon-wrap { flex-shrink: 0; padding-top: 2px; }
+    .explain-icon-circle {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 17px;
+    }
+    .explain-icon-circle.green  { background: rgba(0,212,160,.13); }
+    .explain-icon-circle.teal   { background: rgba(0,229,176,.13); }
+    .explain-icon-circle.blue   { background: rgba(0,150,255,.13); }
+    .explain-icon-circle.purple { background: rgba(139,92,246,.13); }
+    .explain-icon-circle.warn   { background: rgba(245,158,11,.13); }
+
+    .explain-body { flex: 1; min-width: 0; }
+    .explain-title {
+      font-size: 13px; font-weight: 700;
+      color: var(--text); margin-bottom: 5px; letter-spacing: .01em;
+    }
+    .explain-desc {
+      font-size: 13px; color: var(--muted); line-height: 1.7;
+    }
+    .explain-desc strong { color: var(--text); font-weight: 600; }
+
+    /* Formula row */
+    .explain-formula-row {
+      margin-top: 10px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .fml-item {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.04); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 12px;
+    }
+    .fml-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    .fml-val   { font-size: 13px; font-weight: 700; color: var(--text); }
+    .fml-arrow { color: var(--muted); font-size: 14px; }
+
+    /* Tags */
+    .explain-tags {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;
+    }
+    .etag {
+      font-size: 11px; font-weight: 600; letter-spacing: .04em;
+      padding: 4px 10px; border-radius: 99px;
+    }
+    .etag.green  { background: rgba(0,212,160,.12); color: var(--accent1); border: 1px solid rgba(0,212,160,.25); }
+    .etag.blue   { background: rgba(0,150,255,.12); color: var(--accent2); border: 1px solid rgba(0,150,255,.25); }
+    .etag.warn   { background: rgba(245,158,11,.10); color: #f59e0b;       border: 1px solid rgba(245,158,11,.25); }
+    .etag.purple { background: rgba(139,92,246,.10); color: #a78bfa;       border: 1px solid rgba(139,92,246,.25); }
+
+    /* Mini bar inside explanation */
+    .explain-mini-bar { margin-top: 12px; }
+    .emb-track {
+      height: 10px; border-radius: 99px;
+      background: var(--border); overflow: hidden; display: flex;
+    }
+    .emb-fill-modal  { background: var(--accent2); height: 100%; transition: width .8s cubic-bezier(.22,1,.36,1); }
+    .emb-fill-profit { background: var(--accent1); height: 100%; transition: width .8s .1s cubic-bezier(.22,1,.36,1); }
+    .emb-labels { display: flex; justify-content: space-between; margin-top: 8px; flex-wrap: wrap; gap: 6px; }
+    .emb-label { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    .emb-label::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+    .emb-label.blue::before  { background: var(--accent2); }
+    .emb-label.green::before { background: var(--accent1); }
+
+    footer { text-align: center; margin-top: 32px; padding-bottom: 40px; font-size: 12px; color: var(--muted); line-height: 1.7; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Language + Currency controls -->
+  <div class="top-controls">
+    <div class="pill-group">
+      <button class="pill-btn active" id="btn-en" onclick="setLang('en')">🇬🇧 English</button>
+      <button class="pill-btn"        id="btn-id" onclick="setLang('id')">🇮🇩 Indonesia</button>
+      <div class="pill-divider"></div>
+      <button class="pill-btn active" id="btn-idr" onclick="setCurrency('IDR')">Rp IDR</button>
+      <button class="pill-btn"        id="btn-usd" onclick="setCurrency('USD')">$ USD</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-mark">
+      <div class="logo-icon">💹</div>
+      <span class="logo-name">DepositCalc</span>
+    </div>
+    <h1 data-t="h1_main"></h1>
+    <p data-t="h1_sub"></p>
+  </header>
+
+  <!-- What is deposit -->
+  <div class="info-box">
+    <div class="info-box-title">💡 <span data-t="info_title"></span></div>
+    <p data-t="info_body"></p>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <div class="disclaimer-icon">⚠️</div>
+    <p data-t="disclaimer_body"></p>
+  </div>
+
+  <!-- Calculator card -->
+  <div class="card">
+    <div class="section-label" data-t="section_params"></div>
+
+    <div class="grid-2" style="margin-bottom:20px;">
+      <!-- Principal -->
+      <div class="field">
+        <div class="label-row">
+          <label for="modal" data-t="label_principal"></label>
+          <span class="limit-badge" id="limit-modal" data-t="limit_modal"></span>
+        </div>
+        <div class="input-wrap">
+          <span class="input-prefix" id="currency-prefix">Rp</span>
+          <input type="number" id="modal" class="has-prefix" placeholder="10000000" min="1" max="100000000000" step="1" />
+        </div>
+        <span class="error-msg" id="err-modal" data-t="err_principal"></span>
+        <div class="field-hint" data-t="hint_principal"></div>
+      </div>
+
+      <!-- Rate -->
+      <div class="field">
+        <div class="label-row">
+          <label for="bunga" data-t="label_rate"></label>
+          <span class="limit-badge" data-t="limit_rate"></span>
+        </div>
+        <div class="input-wrap">
+          <input type="number" id="bunga" class="has-suffix" placeholder="5.5" min="0.01" max="50" step="0.01" />
+          <span class="input-suffix">%</span>
+        </div>
+        <span class="error-msg" id="err-bunga" data-t="err_rate"></span>
+        <div class="field-hint" data-t="hint_rate"></div>
+      </div>
+    </div>
+
+    <!-- Duration -->
+    <div class="field" style="margin-bottom:20px;">
+      <div class="label-row">
+        <label data-t="label_duration"></label>
+        <span class="limit-badge" id="limit-durasi"></span>
+      </div>
+      <div class="duration-row">
+        <div class="input-wrap">
+          <input type="number" id="durasi" placeholder="12" min="1" max="360" step="1" />
+        </div>
+        <select id="satuan-durasi" onchange="updateDurationLimit()">
+          <option value="months" data-t="opt_months"></option>
+          <option value="years"  data-t="opt_years"></option>
+        </select>
+      </div>
+      <span class="error-msg" id="err-durasi" data-t="err_duration"></span>
+      <div class="field-hint" data-t="hint_duration"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label" data-t="section_interest"></div>
+
+    <!-- Interest type radio -->
+    <div class="field" style="margin-bottom: 16px;">
+      <div class="radio-group">
+        <label class="radio-pill">
+          <input type="radio" name="interest-type" value="simple" checked onchange="toggleCompound()" />
+          <span class="dot"></span>
+          <div>
+            <div class="pill-label" data-t="radio_simple"></div>
+          </div>
+        </label>
+        <label class="radio-pill">
+          <input type="radio" name="interest-type" value="compound" onchange="toggleCompound()" />
+          <span class="dot"></span>
+          <div>
+            <div class="pill-label" data-t="radio_compound"></div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Interest explanation cards -->
+    <div class="interest-info show" id="interest-info">
+      <div class="icard simple" id="icard-simple">
+        <div class="icard-title" data-t="icard_simple_title"></div>
+        <p data-t="icard_simple_body"></p>
+        <span class="icard-formula">A = P(1 + r × t)</span>
+      </div>
+      <div class="icard compound" id="icard-compound">
+        <div class="icard-title" data-t="icard_compound_title"></div>
+        <p data-t="icard_compound_body"></p>
+        <span class="icard-formula">A = P(1 + r/n)ⁿᵗ</span>
+      </div>
+    </div>
+
+    <!-- Compound frequency (hidden until compound selected) -->
+    <div id="compound-options">
+      <div class="field">
+        <label for="frekuensi" data-t="label_freq"></label>
+        <select id="frekuensi" onchange="updateFreqHint()">
+          <option value="1"   data-t="freq_annual"></option>
+          <option value="2"   data-t="freq_semi"></option>
+          <option value="4"   data-t="freq_quarterly"></option>
+          <option value="12"  data-t="freq_monthly" selected></option>
+          <option value="365" data-t="freq_daily"></option>
+        </select>
+        <div id="freq-hint" class="show" data-t="freq_hint_monthly"></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn-calc" onclick="calculate()" data-t="btn_calc"></button>
+
+    <!-- Result panel -->
+    <div id="result-panel">
+      <div class="divider"></div>
+      <div class="result-header">
+        <span class="badge" data-t="badge_result"></span>
+        <h2 data-t="result_title"></h2>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card total">
+          <div class="stat-label" data-t="stat_total"></div>
+          <div class="stat-value" id="res-total">—</div>
+          <div class="stat-sub"  data-t="stat_total_sub"></div>
+        </div>
+        <div class="stat-card profit">
+          <div class="stat-label" data-t="stat_earnings"></div>
+          <div class="stat-value" id="res-profit">—</div>
+          <div class="stat-sub"  id="res-profit-sub"></div>
+        </div>
+        <div class="stat-card apy">
+          <div class="stat-label" id="stat-rate-label" data-t="stat_return"></div>
+          <div class="stat-value" id="res-rate">—</div>
+          <div class="stat-sub"  id="res-rate-sub" data-t="stat_return_sub"></div>
+        </div>
+      </div>
+
+      <div class="breakdown-bar">
+        <h3 data-t="bar_title"></h3>
+        <div class="bar-track">
+          <div class="bar-fill-modal"  id="bar-modal"  style="width:0%"></div>
+          <div class="bar-fill-profit" id="bar-profit" style="width:0%"></div>
+        </div>
+        <div class="bar-legend">
+          <div class="legend-item">
+            <span class="legend-dot modal"></span>
+            <span data-t="legend_principal"></span> (<span id="leg-modal-pct">—</span>)
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot profit"></span>
+            <span data-t="legend_earnings"></span> (<span id="leg-profit-pct">—</span>)
+          </div>
+        </div>
+      </div>
+
+      <!-- Result explanation -->
+      <div class="result-explain">
+        <div class="result-explain-header">
+          <span>📖</span>
+          <span data-t="explain_title"></span>
+        </div>
+        <div class="explain-rows">
+
+          <!-- 1. Total Value -->
+          <div class="explain-row">
+            <div class="explain-icon-wrap green">
+              <div class="explain-icon-circle green">💰</div>
+            </div>
+            <div class="explain-body">
+              <div class="explain-title" data-t="explain_total_title"></div>
+              <div class="explain-desc" id="explain-total-desc"></div>
+              <div class="explain-formula-row" id="explain-total-formula"></div>
+            </div>
+          </div>
+
+          <!-- 2. Earnings -->
+          <div class="explain-row">
+            <div class="explain-icon-wrap teal">
+              <div class="explain-icon-circle teal">📈</div>
+            </div>
+            <div class="explain-body">
+              <div class="explain-title" data-t="explain_profit_title"></div>
+              <div class="explain-desc" id="explain-profit-desc"></div>
+              <div class="explain-tags" id="explain-profit-tags"></div>
+            </div>
+          </div>
+
+          <!-- 3. Rate / APY -->
+          <div class="explain-row">
+            <div class="explain-icon-wrap blue">
+              <div class="explain-icon-circle blue">🎯</div>
+            </div>
+            <div class="explain-body">
+              <div class="explain-title" id="explain-rate-title"></div>
+              <div class="explain-desc" id="explain-rate-desc"></div>
+              <div class="explain-tags" id="explain-rate-tags"></div>
+            </div>
+          </div>
+
+          <!-- 4. Composition -->
+          <div class="explain-row">
+            <div class="explain-icon-wrap purple">
+              <div class="explain-icon-circle purple">📊</div>
+            </div>
+            <div class="explain-body">
+              <div class="explain-title" data-t="explain_bar_title"></div>
+              <div class="explain-desc" id="explain-bar-desc"></div>
+              <div class="explain-mini-bar">
+                <div class="emb-track">
+                  <div class="emb-fill-modal"  id="emb-modal"></div>
+                  <div class="emb-fill-profit" id="emb-profit"></div>
+                </div>
+                <div class="emb-labels">
+                  <span class="emb-label blue" id="emb-label-modal"></span>
+                  <span class="emb-label green" id="emb-label-profit"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Tip / Conclusion -->
+          <div class="explain-row last-row">
+            <div class="explain-icon-wrap warn">
+              <div class="explain-icon-circle warn">💡</div>
+            </div>
+            <div class="explain-body">
+              <div class="explain-title" data-t="explain_tip_title"></div>
+              <div class="explain-desc" id="explain-tip-desc"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer data-t="footer"></footer>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const pct = v => v.toFixed(2) + '%';
+
+  /* ── Translations ─────────────────────────────────────────────────────── */
+  const LANG = {
+    en: {
+      h1_main:           'Deposit <em>Investment</em> Simulator',
+      h1_sub:            'Instantly calculate the potential return on your time deposit',
+      info_title:        'What is a Time Deposit?',
+      info_body:         'A time deposit (deposito) is a savings product offered by banks where you place a fixed amount of money for a predetermined period at a fixed interest rate. Unlike regular savings, your funds are locked in until maturity — in exchange for a higher, guaranteed interest rate. It is considered one of the safest low-risk investment instruments.',
+      disclaimer_body:   '⚠️ <strong>Important:</strong> This tool is for estimation purposes only. Results are approximate and do not account for taxes, inflation, or bank-specific terms. Always consult your bank and exercise caution before making any deposit investment decisions.',
+      section_params:    'Investment Parameters',
+      label_principal:   'Initial Principal',
+      err_principal:     'Enter a valid amount within the allowed range',
+      label_rate:        'Annual Interest Rate',
+      err_rate:          'Enter a rate between 0.01% and 50%',
+      label_duration:    'Investment Duration',
+      err_duration:      'Enter a whole number within the allowed range',
+      opt_months:        'Months',
+      opt_years:         'Years',
+      section_interest:  'Interest Type',
+      radio_simple:      'Simple Interest',
+      radio_simple_sub:  'A = P(1 + r × t)',
+      radio_compound:    'Compound Interest',
+      radio_compound_sub:'A = P(1 + r/n)ⁿᵗ',
+      label_freq:        'Compounding Frequency',
+      freq_annual:       'Annually (1×/year)',
+      freq_semi:         'Semi-annually (2×/year)',
+      freq_quarterly:    'Quarterly (4×/year)',
+      freq_monthly:      'Monthly (12×/year)',
+      freq_daily:        'Daily (365×/year)',
+      btn_calc:          'Calculate Return →',
+      badge_result:      'Result',
+      result_title:      'Your Investment Summary',
+      stat_total:        'Total Value',
+      stat_total_sub:    'After maturity',
+      stat_earnings:     'Total Earnings',
+      stat_return:       'Total Return',
+      stat_return_sub:   'Over investment period',
+      stat_apy:          'APY (Effective)',
+      stat_apy_sub:      'Annual Percentage Yield',
+      bar_title:         'Value Composition',
+      legend_principal:  'Principal',
+      legend_earnings:   'Earnings',
+      above_principal:   'above principal',
+      hint_principal:    'The initial amount of money you deposit into the bank.',
+      hint_rate:         'The annual interest rate offered by the bank for this deposit product.',
+      hint_duration:     'How long you plan to keep the money deposited before withdrawing.',
+      icard_simple_title:'Simple Interest',
+      icard_simple_body: 'Interest is calculated only on the original principal. The interest amount stays the same each period — straightforward and predictable.',
+      icard_compound_title:'Compound Interest',
+      icard_compound_body: 'Interest is calculated on both the principal and previously earned interest. Your money grows faster over time as interest compounds on top of itself.',
+      freq_hint_annual:  'Interest is added once per year. Simpler but grows slower than more frequent compounding.',
+      freq_hint_semi:    'Interest is added every 6 months (twice a year). A common option for mid-term deposits.',
+      freq_hint_quarterly:'Interest is added every 3 months (4 times a year). Grows noticeably faster than annual.',
+      freq_hint_monthly: 'Interest is added every month (12 times a year). Most common for bank time deposits.',
+      freq_hint_daily:   'Interest is added every day (365 times a year). Maximizes compounding effect — closest to continuous growth.',
+      limit_modal:       'max Rp 100B',
+      limit_rate:        '0.01% – 50%',
+      limit_months:      '1 – 360 months',
+      limit_years:       '1 – 30 years',
+      explain_title:     'Understanding Your Results',
+      explain_total_title:'① Total Value at Maturity',
+      explain_profit_title:'② Total Interest Earned',
+      explain_bar_title: '③ Principal vs. Earnings Breakdown',
+      explain_tip_title: '④ What This Means For You',
+      footer:            '© 2025 DepositCalc · This is a simulation tool only, not financial advice.\nAlways be careful and informed before making deposit investment decisions.',
+    },
+    id: {
+      h1_main:           'Simulasi <em>Investasi</em> Deposito',
+      h1_sub:            'Hitung potensi keuntungan deposito Anda secara instan & akurat',
+      info_title:        'Apa itu Deposito?',
+      info_body:         'Deposito adalah produk simpanan bank di mana Anda menempatkan sejumlah uang dalam jangka waktu tertentu dengan suku bunga tetap. Berbeda dari tabungan biasa, dana Anda terkunci hingga jatuh tempo — sebagai imbalannya Anda mendapat bunga yang lebih tinggi dan terjamin. Deposito termasuk salah satu instrumen investasi paling aman dengan risiko rendah.',
+      disclaimer_body:   '⚠️ <strong>Penting:</strong> Kalkulator ini hanya bersifat estimasi. Hasil perhitungan bersifat perkiraan dan tidak memperhitungkan pajak, inflasi, atau ketentuan khusus bank. Selalu konsultasikan dengan bank Anda dan berhati-hatilah sebelum memutuskan investasi deposito.',
+      section_params:    'Parameter Investasi',
+      label_principal:   'Modal Awal',
+      err_principal:     'Masukkan nominal modal yang valid sesuai batas',
+      label_rate:        'Suku Bunga Tahunan',
+      err_rate:          'Masukkan suku bunga antara 0,01% dan 50%',
+      label_duration:    'Lama Investasi',
+      err_duration:      'Masukkan angka bulat dalam rentang yang diizinkan',
+      opt_months:        'Bulan',
+      opt_years:         'Tahun',
+      section_interest:  'Jenis Bunga',
+      radio_simple:      'Bunga Sederhana',
+      radio_simple_sub:  'A = P(1 + r × t)',
+      radio_compound:    'Bunga Majemuk',
+      radio_compound_sub:'A = P(1 + r/n)ⁿᵗ',
+      label_freq:        'Frekuensi Penggandaan',
+      freq_annual:       'Tahunan (1×/tahun)',
+      freq_semi:         'Semesteran (2×/tahun)',
+      freq_quarterly:    'Kuartalan (4×/tahun)',
+      freq_monthly:      'Bulanan (12×/tahun)',
+      freq_daily:        'Harian (365×/tahun)',
+      btn_calc:          'Hitung Hasil Investasi →',
+      badge_result:      'Hasil',
+      result_title:      'Ringkasan Investasi Anda',
+      stat_total:        'Total Akhir',
+      stat_total_sub:    'Setelah jatuh tempo',
+      stat_earnings:     'Total Keuntungan',
+      stat_return:       'Total Keuntungan (%)',
+      stat_return_sub:   'Selama periode investasi',
+      stat_apy:          'APY (Efektif)',
+      stat_apy_sub:      'Imbal hasil efektif per tahun',
+      bar_title:         'Komposisi Nilai Akhir',
+      legend_principal:  'Modal awal',
+      legend_earnings:   'Keuntungan',
+      above_principal:   'di atas modal',
+      hint_principal:    'Jumlah uang awal yang Anda setorkan ke bank sebagai modal deposito.',
+      hint_rate:         'Tingkat bunga tahunan yang ditawarkan bank untuk produk deposito ini.',
+      hint_duration:     'Berapa lama Anda berencana menyimpan dana sebelum dicairkan.',
+      icard_simple_title:'Bunga Sederhana',
+      icard_simple_body: 'Bunga dihitung hanya dari modal awal. Jumlah bunga tetap sama setiap periode — mudah diprediksi dan transparan.',
+      icard_compound_title:'Bunga Majemuk',
+      icard_compound_body: 'Bunga dihitung dari modal awal ditambah bunga yang sudah terkumpul. Uang Anda tumbuh lebih cepat karena bunga berbunga dari waktu ke waktu.',
+      freq_hint_annual:  'Bunga ditambahkan sekali setahun. Lebih sederhana namun pertumbuhannya lebih lambat.',
+      freq_hint_semi:    'Bunga ditambahkan setiap 6 bulan (2 kali setahun). Umum untuk deposito jangka menengah.',
+      freq_hint_quarterly:'Bunga ditambahkan setiap 3 bulan (4 kali setahun). Tumbuh lebih cepat dibanding tahunan.',
+      freq_hint_monthly: 'Bunga ditambahkan setiap bulan (12 kali setahun). Paling umum digunakan oleh bank deposito.',
+      freq_hint_daily:   'Bunga ditambahkan setiap hari (365 kali setahun). Memaksimalkan efek bunga majemuk — pertumbuhan paling optimal.',
+      limit_modal:       'maks Rp 100T',
+      limit_rate:        '0,01% – 50%',
+      limit_months:      '1 – 360 bulan',
+      limit_years:       '1 – 30 tahun',
+      explain_title:     'Penjelasan Hasil Perhitungan',
+      explain_total_title:'① Total Nilai Saat Jatuh Tempo',
+      explain_profit_title:'② Total Bunga yang Diperoleh',
+      explain_bar_title: '③ Rincian Modal vs. Keuntungan',
+      explain_tip_title: '④ Apa Artinya Bagi Anda',
+      footer:            '© 2025 DepositCalc · Ini hanya alat simulasi, bukan saran keuangan.\nSelalu berhati-hati dan cari informasi sebelum berinvestasi deposito.',
+    }
+  };
+
+  let activeLang     = 'en';
+  let activeCurrency = 'IDR';
+
+  /* ── Currency config ──────────────────────────────────────────────────── */
+  const CURRENCIES = {
+    IDR: {
+      prefix: 'Rp', max: 100_000_000_000, maxShort: '100B',
+      placeholder: '10000000',
+      fmt: v => 'Rp\u00A0' + Math.round(v).toLocaleString('id-ID'),
+    },
+    USD: {
+      prefix: '$', max: 100_000_000, maxShort: '100M',
+      placeholder: '10000',
+      fmt: v => '$\u00A0' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+    }
+  };
+
+  /* ── Apply translations ───────────────────────────────────────────────── */
+  function applyLang() {
+    const T = LANG[activeLang];
+    document.querySelectorAll('[data-t]').forEach(el => {
+      const key = el.getAttribute('data-t');
+      if (!T[key]) return;
+      if (key === 'limit_modal') return; // handled by updateModalLimit
+      if (el.tagName === 'OPTION') { el.textContent = T[key]; return; }
+      el.innerHTML = T[key];
+    });
+    updateModalLimit();
+    const unit = $('satuan-durasi').value;
+    $('limit-durasi').textContent = unit === 'months' ? T.limit_months : T.limit_years;
+    const profitSub = $('res-profit-sub');
+    if (profitSub.dataset.val) profitSub.textContent = profitSub.dataset.val + ' ' + T.above_principal;
+    const isCompound = document.querySelector('input[name="interest-type"]:checked').value === 'compound';
+    $('stat-rate-label').textContent = isCompound ? T.stat_apy : T.stat_return;
+    $('res-rate-sub').textContent    = isCompound ? T.stat_apy_sub : T.stat_return_sub;
+    $('icard-simple').classList.toggle('active', !isCompound);
+    $('icard-compound').classList.toggle('active', isCompound);
+    if (isCompound) updateFreqHint();
+  }
+
+  function setLang(lang) {
+    activeLang = lang;
+    $('btn-en').classList.toggle('active', lang === 'en');
+    $('btn-id').classList.toggle('active', lang === 'id');
+    document.documentElement.lang = lang;
+    applyLang();
+    if ($('result-panel').classList.contains('show')) calculate(true);
+  }
+
+  function setCurrency(code) {
+    activeCurrency = code;
+    const cfg = CURRENCIES[code];
+    $('btn-idr').classList.toggle('active', code === 'IDR');
+    $('btn-usd').classList.toggle('active', code === 'USD');
+    $('currency-prefix').textContent = cfg.prefix;
+    const el = $('modal');
+    el.max = cfg.max; el.placeholder = cfg.placeholder;
+    el.value = ''; el.classList.remove('invalid');
+    $('err-modal').classList.remove('show');
+    $('result-panel').classList.remove('show');
+    updateModalLimit();
+  }
+
+  function updateModalLimit() {
+    const cfg    = CURRENCIES[activeCurrency];
+    const prefix = activeLang === 'id' ? 'maks' : 'max';
+    // IDR: use "T" (Triliun) in Indonesian, "B" (Billion) in English
+    // USD: always "M"
+    let shortLabel;
+    if (activeCurrency === 'IDR') {
+      shortLabel = activeLang === 'id' ? '100T' : '100B';
+    } else {
+      shortLabel = '100M';
+    }
+    $('limit-modal').textContent = `${prefix} ${cfg.prefix} ${shortLabel}`;
+  }
+
+  /* ── Toggle compound options ──────────────────────────────────────────── */
+  function toggleCompound() {
+    const isCompound = document.querySelector('input[name="interest-type"]:checked').value === 'compound';
+    $('compound-options').classList.toggle('visible', isCompound);
+    const T = LANG[activeLang];
+    $('stat-rate-label').textContent = isCompound ? T.stat_apy : T.stat_return;
+    $('res-rate-sub').textContent    = isCompound ? T.stat_apy_sub : T.stat_return_sub;
+    // Highlight active explanation card
+    $('icard-simple').classList.toggle('active', !isCompound);
+    $('icard-compound').classList.toggle('active', isCompound);
+    if (isCompound) updateFreqHint();
+    else $('freq-hint').classList.remove('show');
+  }
+
+  /* ── Update frequency hint ────────────────────────────────────────────── */
+  function updateFreqHint() {
+    const T   = LANG[activeLang];
+    const val = $('frekuensi').value;
+    const map = { '1': 'annual', '2': 'semi', '4': 'quarterly', '12': 'monthly', '365': 'daily' };
+    const key = 'freq_hint_' + map[val];
+    $('freq-hint').textContent = T[key] || '';
+    $('freq-hint').classList.add('show');
+  }
+
+  /* ── Duration limits ──────────────────────────────────────────────────── */
+  function updateDurationLimit() {
+    const T = LANG[activeLang], unit = $('satuan-durasi').value, el = $('durasi');
+    if (unit === 'months') { el.max = 360; el.placeholder = '12'; $('limit-durasi').textContent = T.limit_months; }
+    else                   { el.max = 30;  el.placeholder = '5';  $('limit-durasi').textContent = T.limit_years; }
+    el.value = ''; el.classList.remove('invalid');
+    $('err-durasi').classList.remove('show');
+  }
+
+  /* ── Clamp ────────────────────────────────────────────────────────────── */
+  function clampInput(el) {
+    const v = parseFloat(el.value), mx = parseFloat(el.max), mn = parseFloat(el.min);
+    if (!isNaN(v) && !isNaN(mx) && v > mx) el.value = mx;
+    if (!isNaN(v) && !isNaN(mn) && v < mn) el.value = mn;
+  }
+  ['modal','bunga','durasi'].forEach(id => {
+    $(id).addEventListener('input', () => {
+      clampInput($(id));
+      $(id).classList.remove('invalid');
+      $('err-' + id).classList.remove('show');
+    });
+  });
+
+  /* ── Validation ───────────────────────────────────────────────────────── */
+  function validate() {
+    let ok = true;
+    const flag = (errId, el, cond) => {
+      $(errId).classList.toggle('show', !cond);
+      el.classList.toggle('invalid', !cond);
+      if (!cond) ok = false;
+    };
+    const cfg = CURRENCIES[activeCurrency];
+    const P = parseFloat($('modal').value);
+    flag('err-modal', $('modal'), !isNaN(P) && P >= 1 && P <= cfg.max);
+    const r = parseFloat($('bunga').value);
+    flag('err-bunga', $('bunga'), !isNaN(r) && r >= 0.01 && r <= 50);
+    const d = parseFloat($('durasi').value), maxD = parseFloat($('durasi').max);
+    flag('err-durasi', $('durasi'), !isNaN(d) && d >= 1 && d <= maxD && Number.isInteger(d));
+    return ok;
+  }
+
+  /* ── Calculate ────────────────────────────────────────────────────────── */
+  function calculate(silent = false) {
+    if (!silent && !validate()) return;
+
+    const T    = LANG[activeLang];
+    const cfg  = CURRENCIES[activeCurrency];
+    const P    = parseFloat($('modal').value);
+    const r    = parseFloat($('bunga').value) / 100;
+    const dur  = parseInt($('durasi').value);
+    const unit = $('satuan-durasi').value;
+    const t    = unit === 'years' ? dur : dur / 12;
+    const type = document.querySelector('input[name="interest-type"]:checked').value;
+    const n    = parseInt($('frekuensi').value);
+
+    if (isNaN(P) || isNaN(r) || isNaN(dur)) return;
+
+    let A, rateDisplay;
+    if (type === 'simple') {
+      A           = P * (1 + r * t);
+      rateDisplay = ((A - P) / P * 100);
+    } else {
+      A           = P * Math.pow(1 + r / n, n * t);
+      rateDisplay = (Math.pow(1 + r / n, n) - 1) * 100; // APY
+    }
+
+    const profit      = A - P;
+    const totalReturn = (profit / P) * 100;
+
+    $('res-total').textContent  = cfg.fmt(A);
+    $('res-profit').textContent = cfg.fmt(profit);
+
+    const profitSub = $('res-profit-sub');
+    profitSub.dataset.val = `+${pct(totalReturn)}`;
+    profitSub.textContent = `+${pct(totalReturn)} ${T.above_principal}`;
+
+    $('res-rate').textContent = pct(rateDisplay);
+    $('stat-rate-label').textContent = type === 'compound' ? T.stat_apy    : T.stat_return;
+    $('res-rate-sub').textContent    = type === 'compound' ? T.stat_apy_sub : T.stat_return_sub;
+
+    const mp = (P / A) * 100, pp = (profit / A) * 100;
+    $('bar-modal').style.width  = mp + '%';
+    $('bar-profit').style.width = pp + '%';
+    $('leg-modal-pct').textContent  = pct(mp);
+    $('leg-profit-pct').textContent = pct(pp);
+
+    // ── Result explanations ──────────────────────────────────────────────
+    const durLabel  = `${dur} ${unit === 'years' ? (activeLang === 'id' ? 'tahun' : dur === 1 ? 'year' : 'years') : (activeLang === 'id' ? 'bulan' : dur === 1 ? 'month' : 'months')}`;
+    const rateLabel = `${(r * 100).toFixed(2)}%`;
+    const freqLabel = type === 'compound' ? $('frekuensi').options[$('frekuensi').selectedIndex].text : '';
+    const monthlyGrowth = cfg.fmt(profit / (unit === 'years' ? dur * 12 : dur));
+    const perYearGrowth = cfg.fmt(profit / t);
+    const nominalRate   = `${(r * 100).toFixed(2)}%`;
+
+    if (activeLang === 'id') {
+      // ① Total value
+      $('explain-total-desc').innerHTML =
+        `Modal awal Anda sebesar <strong>${cfg.fmt(P)}</strong> disimpan selama <strong>${durLabel}</strong> dengan suku bunga <strong>${rateLabel} per tahun</strong>. Pada saat deposito jatuh tempo, Anda akan menerima total <strong>${cfg.fmt(A)}</strong> — itulah jumlah keseluruhan yang masuk ke rekening Anda.`;
+      $('explain-total-formula').innerHTML =
+        `<div class="fml-item"><span class="fml-label">Modal</span><span class="fml-val">${cfg.fmt(P)}</span></div>` +
+        `<span class="fml-arrow">＋</span>` +
+        `<div class="fml-item"><span class="fml-label">Bunga</span><span class="fml-val">${cfg.fmt(profit)}</span></div>` +
+        `<span class="fml-arrow">＝</span>` +
+        `<div class="fml-item"><span class="fml-label">Total</span><span class="fml-val" style="color:var(--accent1)">${cfg.fmt(A)}</span></div>`;
+
+      // ② Profit
+      $('explain-profit-desc').innerHTML =
+        `Keuntungan bersih yang Anda peroleh dari bunga adalah <strong>${cfg.fmt(profit)}</strong>. Ini adalah uang tambahan dari bank, di luar modal Anda. Rata-rata, uang Anda bertumbuh sekitar <strong>${monthlyGrowth} per bulan</strong> atau <strong>${perYearGrowth} per tahun</strong>.`;
+      $('explain-profit-tags').innerHTML =
+        `<span class="etag green">+${pct(totalReturn)} total</span>` +
+        `<span class="etag blue">~${monthlyGrowth}/bulan</span>` +
+        `<span class="etag purple">~${perYearGrowth}/tahun</span>`;
+
+      // ③ Rate
+      if (type === 'compound') {
+        $('explain-rate-title').textContent = '③ APY — Imbal Hasil Efektif Tahunan';
+        $('explain-rate-desc').innerHTML =
+          `Suku bunga nominal deposito Anda adalah <strong>${nominalRate}/tahun</strong>, namun karena bunga digandakan secara <strong>${freqLabel.toLowerCase()}</strong>, imbal hasil efektif nyata (APY) menjadi <strong>${pct(rateDisplay)}</strong>. Perbedaan ini disebut <em>compounding effect</em> — semakin sering bunga digandakan, semakin besar APY dibanding bunga nominal.`;
+        $('explain-rate-tags').innerHTML =
+          `<span class="etag blue">Nominal: ${nominalRate}</span>` +
+          `<span class="etag green">APY: ${pct(rateDisplay)}</span>` +
+          `<span class="etag purple">Frekuensi: ${freqLabel}</span>`;
+      } else {
+        $('explain-rate-title').textContent = '③ Total Return — Persentase Pertumbuhan';
+        $('explain-rate-desc').innerHTML =
+          `Selama <strong>${durLabel}</strong>, total uang Anda bertumbuh sebesar <strong>${pct(rateDisplay)}</strong> dari modal awal. Bunga sederhana dihitung secara proporsional dan linier — setiap periode menghasilkan bunga yang sama, tidak ada efek penggandaan.`;
+        $('explain-rate-tags').innerHTML =
+          `<span class="etag green">Return: ${pct(rateDisplay)}</span>` +
+          `<span class="etag blue">Bunga: ${nominalRate}/tahun</span>`;
+      }
+
+      // ④ Bar
+      const mpF = pct(mp), ppF = pct(pp);
+      $('explain-bar-desc').innerHTML =
+        `Dari total <strong>${cfg.fmt(A)}</strong> yang Anda terima, uang Anda terdiri dari dua bagian: <strong>${mpF} adalah modal awal</strong> (${cfg.fmt(P)}) yang Anda setorkan di awal, dan <strong>${ppF} adalah bunga murni</strong> (${cfg.fmt(profit)}) yang diperoleh dari bank selama periode investasi.`;
+      $('emb-modal').style.width  = mpF;
+      $('emb-profit').style.width = ppF;
+      $('emb-label-modal').textContent  = `Modal: ${mpF} (${cfg.fmt(P)})`;
+      $('emb-label-profit').textContent = `Bunga: ${ppF} (${cfg.fmt(profit)})`;
+
+      // ⑤ Tip
+      const tipType = type === 'compound' ? 'majemuk' : 'sederhana';
+      $('explain-tip-desc').innerHTML =
+        `Dengan strategi deposito <strong>bunga ${tipType}</strong> ini, setiap <strong>${cfg.fmt(P)}</strong> yang Anda investasikan akan menghasilkan tambahan <strong>${cfg.fmt(profit)}</strong> selama <strong>${durLabel}</strong>. ` +
+        (type === 'compound'
+          ? `Ingat: semakin sering frekuensi penggandaan, semakin besar hasil akhir Anda. Bunga majemuk harian memberikan hasil paling optimal.`
+          : `Pertimbangkan untuk menjajaki opsi bunga majemuk — dengan frekuensi penggandaan bulanan atau harian, hasil investasi Anda bisa lebih optimal.`) +
+        ` <span class="etag warn" style="margin-left:4px">⚠ Hasil ini estimasi, konsultasikan dengan bank Anda.</span>`;
+
+    } else {
+      // ① Total value
+      $('explain-total-desc').innerHTML =
+        `You deposited <strong>${cfg.fmt(P)}</strong> for <strong>${durLabel}</strong> at <strong>${rateLabel} per year</strong>. When your deposit matures, you'll receive a total of <strong>${cfg.fmt(A)}</strong> — that's the complete amount credited back to your account.`;
+      $('explain-total-formula').innerHTML =
+        `<div class="fml-item"><span class="fml-label">Principal</span><span class="fml-val">${cfg.fmt(P)}</span></div>` +
+        `<span class="fml-arrow">＋</span>` +
+        `<div class="fml-item"><span class="fml-label">Interest</span><span class="fml-val">${cfg.fmt(profit)}</span></div>` +
+        `<span class="fml-arrow">＝</span>` +
+        `<div class="fml-item"><span class="fml-label">Total</span><span class="fml-val" style="color:var(--accent1)">${cfg.fmt(A)}</span></div>`;
+
+      // ② Profit
+      $('explain-profit-desc').innerHTML =
+        `Your net interest earnings are <strong>${cfg.fmt(profit)}</strong> — money the bank pays you for keeping your funds deposited. On average, your deposit grows by approximately <strong>${monthlyGrowth} per month</strong> or <strong>${perYearGrowth} per year</strong>.`;
+      $('explain-profit-tags').innerHTML =
+        `<span class="etag green">+${pct(totalReturn)} total return</span>` +
+        `<span class="etag blue">~${monthlyGrowth}/month</span>` +
+        `<span class="etag purple">~${perYearGrowth}/year</span>`;
+
+      // ③ Rate
+      if (type === 'compound') {
+        $('explain-rate-title').textContent = '③ APY — Annual Percentage Yield';
+        $('explain-rate-desc').innerHTML =
+          `Your deposit's nominal rate is <strong>${nominalRate}/year</strong>, but because interest compounds <strong>${freqLabel.toLowerCase()}</strong>, the true effective annual return (APY) is <strong>${pct(rateDisplay)}</strong>. This gap is the <em>compounding effect</em> — the more frequently interest compounds, the higher the APY vs. the nominal rate.`;
+        $('explain-rate-tags').innerHTML =
+          `<span class="etag blue">Nominal: ${nominalRate}</span>` +
+          `<span class="etag green">APY: ${pct(rateDisplay)}</span>` +
+          `<span class="etag purple">Frequency: ${freqLabel}</span>`;
+      } else {
+        $('explain-rate-title').textContent = '③ Total Return — Overall Growth';
+        $('explain-rate-desc').innerHTML =
+          `Over <strong>${durLabel}</strong>, your money grew by <strong>${pct(rateDisplay)}</strong> from your starting principal. Simple interest is linear and proportional — every period generates the same fixed interest amount, with no compounding effect.`;
+        $('explain-rate-tags').innerHTML =
+          `<span class="etag green">Return: ${pct(rateDisplay)}</span>` +
+          `<span class="etag blue">Rate: ${nominalRate}/year</span>`;
+      }
+
+      // ④ Bar
+      const mpF = pct(mp), ppF = pct(pp);
+      $('explain-bar-desc').innerHTML =
+        `Your total payout of <strong>${cfg.fmt(A)}</strong> consists of two parts: <strong>${mpF} is your original principal</strong> (${cfg.fmt(P)}) that you deposited, and <strong>${ppF} is pure interest</strong> (${cfg.fmt(profit)}) earned from the bank over the investment period.`;
+      $('emb-modal').style.width  = mpF;
+      $('emb-profit').style.width = ppF;
+      $('emb-label-modal').textContent  = `Principal: ${mpF} (${cfg.fmt(P)})`;
+      $('emb-label-profit').textContent = `Interest: ${ppF} (${cfg.fmt(profit)})`;
+
+      // ⑤ Tip
+      const tipType = type === 'compound' ? 'compound' : 'simple';
+      $('explain-tip-desc').innerHTML =
+        `With this <strong>${tipType} interest</strong> strategy, every <strong>${cfg.fmt(P)}</strong> invested earns you an extra <strong>${cfg.fmt(profit)}</strong> over <strong>${durLabel}</strong>. ` +
+        (type === 'compound'
+          ? `Remember: more frequent compounding means higher returns. Daily compounding gives the most optimal result.`
+          : `Consider exploring compound interest options — monthly or daily compounding could increase your final return significantly.`) +
+        ` <span class="etag warn" style="margin-left:4px">⚠ Estimate only — consult your bank.</span>`;
+    }
+
+    if (!silent) {
+      const panel = $('result-panel');
+      panel.classList.remove('show');
+      void panel.offsetWidth;
+      panel.classList.add('show');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  /* ── Init ─────────────────────────────────────────────────────────────── */
+  applyLang();
+  updateDurationLimit();
+  $('icard-simple').classList.add('active');
+</script>
+</body>
+</html>
