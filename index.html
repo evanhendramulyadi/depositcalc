@@ -1720,8 +1720,6 @@
         }
 
         // ④ Bar
-
-$('explain-bar-title').textContent = '④ Rincian Modal vs. Keuntungan';
         const mpF = pct(mp), ppF = pct(pp);
         $('explain-bar-desc').innerHTML =
           `Dari total <strong>${cfg.fmt(A)}</strong> yang Anda terima, uang Anda terdiri dari dua bagian: <strong>${mpF} adalah modal awal</strong> (${cfg.fmt(P)}) yang Anda setorkan di awal, dan <strong>${ppF} adalah bunga murni</strong> (${cfg.fmt(profit)}) yang diperoleh dari bank selama periode investasi.`;
@@ -1777,9 +1775,6 @@ $('explain-bar-title').textContent = '④ Rincian Modal vs. Keuntungan';
         }
 
         // ④ Bar
-
-$('explain-bar-title').textContent = '④ Principal vs. Earnings Breakdown';
-
         const mpF = pct(mp), ppF = pct(pp);
         $('explain-bar-desc').innerHTML =
           `Your total payout of <strong>${cfg.fmt(A)}</strong> consists of two parts: <strong>${mpF} is your original principal</strong> (${cfg.fmt(P)}) that you deposited, and <strong>${ppF} is pure interest</strong> (${cfg.fmt(profit)}) earned from the bank over the investment period.`;
