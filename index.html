@@ -1703,7 +1703,6 @@
 
         // ③ Rate
         if (type === 'compound') {
-          $('explain-rate-title').textContent = '③ APY — Imbal Hasil Efektif Tahunan';
           $('explain-rate-desc').innerHTML =
             `Suku bunga nominal deposito Anda adalah <strong>${nominalRate}/tahun</strong>, namun karena bunga digandakan secara <strong>${freqLabel.toLowerCase()}</strong>, imbal hasil efektif nyata (APY) menjadi <strong>${pct(rateDisplay)}</strong>. Perbedaan ini disebut <em>compounding effect</em> — semakin sering bunga digandakan, semakin besar APY dibanding bunga nominal.`;
           $('explain-rate-tags').innerHTML =
@@ -1711,7 +1710,6 @@
             `<span class="etag green">APY: ${pct(rateDisplay)}</span>` +
             `<span class="etag purple">Frekuensi: ${freqLabel}</span>`;
         } else {
-          $('explain-rate-title').textContent = '③ Total Return — Persentase Pertumbuhan';
           $('explain-rate-desc').innerHTML =
             `Selama <strong>${durLabel}</strong>, total uang Anda bertumbuh sebesar <strong>${pct(rateDisplay)}</strong> dari modal awal. Bunga sederhana dihitung secara proporsional dan linier — setiap periode menghasilkan bunga yang sama, tidak ada efek penggandaan.`;
           $('explain-rate-tags').innerHTML =
@@ -1758,7 +1756,6 @@
 
         // ③ Rate
         if (type === 'compound') {
-          $('explain-rate-title').textContent = '③ APY — Annual Percentage Yield';
           $('explain-rate-desc').innerHTML =
             `Your deposit's nominal rate is <strong>${nominalRate}/year</strong>, but because interest compounds <strong>${freqLabel.toLowerCase()}</strong>, the true effective annual return (APY) is <strong>${pct(rateDisplay)}</strong>. This gap is the <em>compounding effect</em> — the more frequently interest compounds, the higher the APY vs. the nominal rate.`;
           $('explain-rate-tags').innerHTML =
@@ -1766,7 +1763,6 @@
             `<span class="etag green">APY: ${pct(rateDisplay)}</span>` +
             `<span class="etag purple">Frequency: ${freqLabel}</span>`;
         } else {
-          $('explain-rate-title').textContent = '③ Total Return — Overall Growth';
           $('explain-rate-desc').innerHTML =
             `Over <strong>${durLabel}</strong>, your money grew by <strong>${pct(rateDisplay)}</strong> from your starting principal. Simple interest is linear and proportional — every period generates the same fixed interest amount, with no compounding effect.`;
           $('explain-rate-tags').innerHTML =
