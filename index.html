@@ -1711,7 +1711,7 @@
             `<span class="etag green">APY: ${pct(rateDisplay)}</span>` +
             `<span class="etag purple">Frekuensi: ${freqLabel}</span>`;
         } else {
-          $('explain-rate-title').textContent = '③bTotal Return — Persentase Pertumbuhan';
+          $('explain-rate-title').textContent = '③ Total Return — Persentase Pertumbuhan';
           $('explain-rate-desc').innerHTML =
             `Selama <strong>${durLabel}</strong>, total uang Anda bertumbuh sebesar <strong>${pct(rateDisplay)}</strong> dari modal awal. Bunga sederhana dihitung secara proporsional dan linier — setiap periode menghasilkan bunga yang sama, tidak ada efek penggandaan.`;
           $('explain-rate-tags').innerHTML =
@@ -1721,7 +1721,6 @@
 
         // ④ Bar
         const mpF = pct(mp), ppF = pct(pp);
-        $('explain-bar-title').textContent = '④ Rincian Modal vs. Keuntungan';
         $('explain-bar-desc').innerHTML =
           `Dari total <strong>${cfg.fmt(A)}</strong> yang Anda terima, uang Anda terdiri dari dua bagian: <strong>${mpF} adalah modal awal</strong> (${cfg.fmt(P)}) yang Anda setorkan di awal, dan <strong>${ppF} adalah bunga murni</strong> (${cfg.fmt(profit)}) yang diperoleh dari bank selama periode investasi.`;
         $('emb-modal').style.width = mpF;
@@ -1731,8 +1730,6 @@
 
         // ⑤ Tip
         const tipType = type === 'compound' ? 'majemuk' : 'sederhana';
-        // ⑤ Tip (TAMBAHIN INI)
-        $('explain-tip-title').textContent = '⑤ Apa Artinya Bagi Anda';
         $('explain-tip-desc').innerHTML =
           `Dengan strategi deposito <strong>bunga ${tipType}</strong> ini, setiap <strong>${cfg.fmt(P)}</strong> yang Anda investasikan akan menghasilkan tambahan <strong>${cfg.fmt(profit)}</strong> selama <strong>${durLabel}</strong>. ` +
           (type === 'compound'
@@ -1779,7 +1776,6 @@
 
         // ④ Bar
         const mpF = pct(mp), ppF = pct(pp);
-        $('explain-bar-title').textContent = '④ Principal vs Interest Breakdown';
         $('explain-bar-desc').innerHTML =
           `Your total payout of <strong>${cfg.fmt(A)}</strong> consists of two parts: <strong>${mpF} is your original principal</strong> (${cfg.fmt(P)}) that you deposited, and <strong>${ppF} is pure interest</strong> (${cfg.fmt(profit)}) earned from the bank over the investment period.`;
         $('emb-modal').style.width = mpF;
@@ -1789,7 +1785,6 @@
 
         // ⑤ Tip
         const tipType = type === 'compound' ? 'compound' : 'simple';
-        $('explain-tip-title').textContent = '⑤ What This Means for You';
         $('explain-tip-desc').innerHTML =
           `With this <strong>${tipType} interest</strong> strategy, every <strong>${cfg.fmt(P)}</strong> invested earns you an extra <strong>${cfg.fmt(profit)}</strong> over <strong>${durLabel}</strong>. ` +
           (type === 'compound'
