@@ -412,36 +412,18 @@
     }
 
     .radio-pill:has(input:checked) {
-      border-color: var(--accent1);
-      background: rgba(0, 212, 160, .07);
-    }
-
-    .radio-pill input[type="radio"] {
-      display: none;
-    }
-
-    .radio-pill .dot {
-      width: 17px;
-      height: 17px;
-      border: 2px solid var(--border);
-      border-radius: 50%;
-      flex-shrink: 0;
-      display: grid;
-      place-items: center;
-      transition: border-color .2s;
+      border-color: var(--accent2);
+      background: rgba(0, 150, 255, .13);
+      box-shadow: 0 0 0 3px rgba(0, 150, 255, .12);
     }
 
     .radio-pill:has(input:checked) .dot {
-      border-color: var(--accent1);
-      background: rgba(0, 212, 160, .15);
+      border-color: var(--accent2);
+      background: rgba(0, 150, 255, .15);
     }
 
     .radio-pill:has(input:checked) .dot::after {
-      content: '';
-      width: 7px;
-      height: 7px;
-      background: var(--accent1);
-      border-radius: 50%;
+      background: var(--accent2);
     }
 
     .radio-pill .pill-label {
