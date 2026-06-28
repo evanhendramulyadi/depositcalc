@@ -737,14 +737,10 @@
       transition: border-color .25s, background .25s;
     }
 
-    .icard.simple {
-      background: rgba(0, 150, 255, .04);
-      border-color: rgba(0, 150, 255, .25);
-    }
-
+    .icard.simple,
     .icard.compound {
-      background: rgba(0, 150, 255, .04);
-      border-color: rgba(0, 150, 255, .25);
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
     }
 
     .icard.simple.active {
