@@ -438,13 +438,17 @@
     }
 
     /* ── Compound options box ── */
+
     #compound-options {
       display: none;
-      margin-top: 4px;
-      background: rgba(0, 150, 255, .05);
-      border: 1px solid rgba(0, 150, 255, .2);
+      margin-top: 14px;
+      background: var(--card);
+      /* sama seperti card utama */
+      border: 1.5px solid var(--border);
+      /* sama seperti opsi atas */
       border-radius: 10px;
       padding: 20px;
+      transition: .2s;
     }
 
     #compound-options.visible {
