@@ -1321,6 +1321,7 @@
     /* ── Translations ─────────────────────────────────────────────────────── */
     const LANG = {
       en: {
+        page_title: 'DepositCalc — Time Deposit Simulator',
         h1_main: 'Deposit <em>Investment</em> Simulator',
         h1_sub: 'Instantly calculate the potential return on your time deposit',
         info_title: 'What is a Time Deposit?',
@@ -1383,6 +1384,7 @@
         footer: '&copy; 2026–Present Evan Hendra Mulyadi. All Rights Reserved.',
       },
       id: {
+        page_title: 'DepositCalc — Simulasi Deposito',
         h1_main: 'Simulasi <em>Investasi</em> Deposito',
         h1_sub: 'Hitung potensi keuntungan deposito Anda secara instan & akurat',
         info_title: 'Apa itu Deposito?',
@@ -1466,6 +1468,7 @@
     /* ── Apply translations ───────────────────────────────────────────────── */
     function applyLang() {
       const T = LANG[activeLang];
+      if (T.page_title) document.title = T.page_title;
       document.querySelectorAll('[data-t]').forEach(el => {
         const key = el.getAttribute('data-t');
         if (!T[key]) return;
