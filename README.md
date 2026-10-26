@@ -2,7 +2,7 @@
   <img src="img/logo-depositcalc.png" alt="DepositCalc Logo" width="100">
 </p>
 
-<h1 align="center">DepositCalc</h1>
+<h1 align="left">DepositCalc</h1>
 
 DepositCalc is a sleek, responsive client-side time deposit investment simulator designed to help users calculate potential earnings, compare simple vs. compound interest, and visualize portfolio growth directly in their browser.
 
