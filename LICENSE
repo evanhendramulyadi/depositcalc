@@ -1,0 +1,39 @@
+Copyright (c) 2026 Evan Hendra Mulyadi. All rights reserved.
+
+DEPOSITCALC — PROPRIETARY LICENSE
+
+1. OWNERSHIP
+
+DepositCalc is a client-side time deposit investment simulator created by Evan Hendra Mulyadi. The original source code, interface design, layout, written content, calculations, and other project materials are protected by applicable intellectual property laws to the extent such rights are owned by the respective rights holders.
+
+2. PERMITTED ACCESS
+
+This repository is publicly accessible for viewing, studying, and reviewing its source code. Public availability does not, by itself, grant permission to reproduce, modify, redistribute, republish, or commercially exploit protected project materials.
+
+3. RESTRICTIONS
+
+Unless prior written permission has been obtained from the applicable rights holder, you may not, to the extent permitted by applicable law:
+
+* Copy or redistribute the project or substantial portions of its protected materials.
+* Modify, adapt, or create derivative works from protected materials.
+* Republish, sublicense, sell, or commercially exploit protected project materials.
+* Rebrand or rename the original project in a way that falsely implies ownership or authorization.
+* Claim authorship or ownership of the project or materials created by another person.
+* Remove or alter applicable copyright, attribution, or proprietary notices without authorization.
+
+4. THIRD-PARTY MATERIALS
+
+Any third-party libraries, frameworks, fonts, icons, images, assets, or other external materials incorporated into or used by DepositCalc remain subject to their respective licenses, permissions, and terms. This license does not claim ownership of third-party materials or override the rights of their respective copyright holders.
+
+5. NO FINANCIAL ADVICE
+
+DepositCalc is an investment calculation and simulation tool. Its calculations and displayed estimates are provided for informational and educational purposes only and do not constitute financial, investment, tax, or legal advice. Actual returns may differ depending on financial institution policies, applicable taxes, fees, interest calculation methods, and other relevant conditions.
+
+6. LEGAL RIGHTS
+
+Nothing in this notice is intended to override, limit, or restrict rights or exceptions granted by applicable law or any valid license governing third-party materials.
+
+7. PERMISSION REQUESTS
+
+Requests for permission to use, reproduce, modify, or distribute protected project materials must be directed to Evan Hendra Mulyadi. Prior written consent must be obtained before any such use unless otherwise permitted by applicable law.
+
