@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="img/logo-depositcalc.png" alt="DepositCalc Logo" width="100">
+  <img src="img/depositcalc-logo.png" alt="DepositCalc Logo" width="100">
 </p>
 
 <h1 align="left">DepositCalc</h1>

@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DepositCalc — Deposit Simulator</title>
-  <link rel="icon" type="image/png" href="img/logo-depositcalc.png">
+  <link rel="icon" type="image/png" href="img/depositcalc-logo.png">
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet" />
@@ -1057,7 +1057,7 @@
     <header>
       <div class="logo-mark">
         <div class="logo-icon">
-          <img src="img/logo-depositcalc.png" alt="DepositCalc logo" />
+          <img src="img/depositcalc-logo.png" alt="DepositCalc Logo" id="logo-img" data-t="logo_alt" />
         </div>
         <span class="logo-name">DepositCalc</span>
       </div>
@@ -1322,6 +1322,7 @@
     const LANG = {
       en: {
         page_title: 'DepositCalc — Time Deposit Simulator',
+        logo_alt: 'DepositCalc Logo',
         h1_main: 'Deposit <em>Investment</em> Simulator',
         h1_sub: 'Instantly calculate the potential return on your time deposit',
         info_title: 'What is a Time Deposit?',
@@ -1385,6 +1386,7 @@
       },
       id: {
         page_title: 'DepositCalc — Simulasi Deposito',
+        logo_alt: 'Logo DepositCalc',
         h1_main: 'Simulasi <em>Investasi</em> Deposito',
         h1_sub: 'Hitung potensi keuntungan deposito Anda secara instan & akurat',
         info_title: 'Apa itu Deposito?',
@@ -1474,8 +1476,11 @@
         if (!T[key]) return;
         if (key === 'limit_modal') return; // handled by updateModalLimit
         if (el.tagName === 'OPTION') { el.textContent = T[key]; return; }
+        if (el.tagName === 'IMG') { el.alt = T[key]; return; }
         el.innerHTML = T[key];
       });
+      const logoImg = $('logo-img');
+      if (logoImg && T.logo_alt) logoImg.alt = T.logo_alt;
       updateModalLimit();
       const unit = $('satuan-durasi').value;
       $('limit-durasi').textContent = unit === 'months' ? T.limit_months : T.limit_years;
